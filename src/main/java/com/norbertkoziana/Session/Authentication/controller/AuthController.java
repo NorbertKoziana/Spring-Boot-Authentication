@@ -1,6 +1,7 @@
 package com.norbertkoziana.Session.Authentication.controller;
 import com.norbertkoziana.Session.Authentication.dto.LoginRequest;
 
+import com.norbertkoziana.Session.Authentication.dto.RegisterRequest;
 import com.norbertkoziana.Session.Authentication.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +24,12 @@ public class AuthController {
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         authService.login(loginRequest, request, response);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@RequestBody RegisterRequest registerRequest){
+        authService.register(registerRequest);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 }
