@@ -47,11 +47,11 @@ public class AuthServiceImpl implements AuthService {
         securityContextRepository.saveContext(context, request, response);
     }
     @Override
-    @Transactional
     public void register(RegisterRequest registerRequest) {
         //TODO: add validation
 
-        if(userRepository.findByEmail(registerRequest.getEmail()).isPresent())
+        if(userRepository.findByEmail(registerRequest.getEmail()).isPresent())//TODO: move this if to controller and return reponse
+            // entity instead of throwing exception
             throw new IllegalStateException("Email already used");
 
         User user = User.builder()

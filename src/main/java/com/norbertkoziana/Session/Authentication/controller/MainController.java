@@ -5,13 +5,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MainController {
     @GetMapping("/")
-    public String home(){
+    public String homePage(){
         return "Hello World!";
     }
 
-    @GetMapping("/test")
+    @GetMapping("/private")
     public String test(){
-        return "Hello test!";
+        return "Hello logged in users!";
     }
 
 }

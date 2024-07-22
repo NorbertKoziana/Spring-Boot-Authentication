@@ -1,5 +1,6 @@
 package com.norbertkoziana.Session.Authentication.config;
 
+import com.norbertkoziana.Session.Authentication.csrf.SpaCsrfTokenRequestHandler;
 import com.norbertkoziana.Session.Authentication.repository.UserRepository;
 import com.norbertkoziana.Session.Authentication.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.*;
 
 @Configuration
 @EnableWebSecurity
@@ -46,15 +48,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                .csrf(csrf -> csrf.disable())
-                .logout((logout) -> logout.logoutUrl("/auth/logout"))
+                .csrf((csrf) -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                )
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/login", "/auth/register", "/test").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register").anonymous()
+                        .requestMatchers( "/", "/error").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .logout((logout) -> logout.logoutUrl("/auth/logout").logoutSuccessUrl("/"))
+        ;
 
         return http.build();
     }
 
 }
+
