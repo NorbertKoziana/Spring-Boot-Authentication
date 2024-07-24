@@ -6,7 +6,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 
-    void login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response);
+    boolean login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response);
 
     void register(RegisterRequest registerRequest);
+
+    boolean emailAlreadyUsed(String email);
 }

@@ -22,12 +22,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        authService.login(loginRequest, request, response);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(authService.login(loginRequest, request, response))
+            return new ResponseEntity<>(HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterRequest registerRequest){
+        if(authService.emailAlreadyUsed(registerRequest.getEmail()))
+            return new ResponseEntity<>(HttpStatus.OK);
+
         authService.register(registerRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

@@ -6,11 +6,11 @@ import com.norbertkoziana.Session.Authentication.user.Role;
 import com.norbertkoziana.Session.Authentication.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -34,25 +34,27 @@ public class AuthServiceImpl implements AuthService {
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     @Override
-    public void login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        //authenticate
-        UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
-                loginRequest.getEmail(), loginRequest.getPassword());
-        Authentication authentication = authenticationManager.authenticate(token);
+    public boolean login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+        try{
+            //authenticate
+            UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
+                    loginRequest.getEmail(), loginRequest.getPassword());
+            Authentication authentication = authenticationManager.authenticate(token);
 
-        //session management
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-        context.setAuthentication(authentication);
-        securityContextHolderStrategy.setContext(context);
-        securityContextRepository.saveContext(context, request, response);
+            //session management
+            SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+            context.setAuthentication(authentication);
+            securityContextHolderStrategy.setContext(context);
+            securityContextRepository.saveContext(context, request, response);
+
+            return true;
+        }catch (AuthenticationException e){
+            return false;
+        }
     }
     @Override
     public void register(RegisterRequest registerRequest) {
         //TODO: add validation
-
-        if(userRepository.findByEmail(registerRequest.getEmail()).isPresent())//TODO: move this if to controller and return reponse
-            // entity instead of throwing exception
-            throw new IllegalStateException("Email already used");
 
         User user = User.builder()
                 .firstName(registerRequest.getFirstName())
@@ -65,6 +67,11 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
-
     }
+    @Override
+    public boolean emailAlreadyUsed(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+
 }
