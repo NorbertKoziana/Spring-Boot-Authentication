@@ -1,0 +1,30 @@
+package com.norbertkoziana.Session.Authentication.confirmation;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+@Service
+@RequiredArgsConstructor
+public class ConfirmationServiceImpl implements ConfirmationService {
+
+    private final ConfirmationRepository confirmationRepository;
+
+    @Override
+    @Transactional
+    public void confirmEmail(String token) {
+
+        Confirmation confirmation = confirmationRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalStateException("Token not found."));
+
+        if(confirmation.getConfirmed())
+            throw new IllegalStateException("Token already confirmed.");
+
+        if(confirmation.getExpiresAt().isBefore(LocalDateTime.now()))
+            throw new IllegalStateException("Token expired.");
+
+        confirmation.getUser().setEnabled(true);
+        confirmation.setConfirmed(true);
+    }
+}

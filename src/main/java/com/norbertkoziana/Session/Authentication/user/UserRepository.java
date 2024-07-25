@@ -1,4 +1,4 @@
-package com.norbertkoziana.Session.Authentication.repository;
+package com.norbertkoziana.Session.Authentication.user;
 import com.norbertkoziana.Session.Authentication.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

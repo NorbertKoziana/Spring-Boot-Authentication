@@ -1,16 +1,20 @@
-package com.norbertkoziana.Session.Authentication.service;
+package com.norbertkoziana.Session.Authentication.auth;
+import com.norbertkoziana.Session.Authentication.confirmation.Confirmation;
+import com.norbertkoziana.Session.Authentication.confirmation.ConfirmationRepository;
 import com.norbertkoziana.Session.Authentication.dto.LoginRequest;
 import com.norbertkoziana.Session.Authentication.dto.RegisterRequest;
-import com.norbertkoziana.Session.Authentication.repository.UserRepository;
+import com.norbertkoziana.Session.Authentication.email.EmailService;
+import com.norbertkoziana.Session.Authentication.user.UserRepository;
 import com.norbertkoziana.Session.Authentication.user.Role;
 import com.norbertkoziana.Session.Authentication.user.User;
+import com.norbertkoziana.Session.Authentication.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -18,6 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,32 +34,37 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
+    /*When I want to just save user to database then I use repository, when I use some logic associated with user
+     e.g. checking if user exists, then I use userService, that is why I inject both*/
+
     private final UserRepository userRepository;
+
+    private final UserService userService;
+
+    private final ConfirmationRepository confirmationRepository;
+
+    private final EmailService emailService;
 
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     @Override
-    public boolean login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        try{
-            //authenticate
-            UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
-                    loginRequest.getEmail(), loginRequest.getPassword());
-            Authentication authentication = authenticationManager.authenticate(token);
+    public void login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+        //authenticate
+        UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
+                loginRequest.getEmail(), loginRequest.getPassword());
+        Authentication authentication = authenticationManager.authenticate(token);
 
-            //session management
-            SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-            context.setAuthentication(authentication);
-            securityContextHolderStrategy.setContext(context);
-            securityContextRepository.saveContext(context, request, response);
-
-            return true;
-        }catch (AuthenticationException e){
-            return false;
-        }
+        //session management
+        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+        context.setAuthentication(authentication);
+        securityContextHolderStrategy.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
     }
+
     @Override
+    @Transactional
     public void register(RegisterRequest registerRequest) {
         //TODO: add validation
 
@@ -62,16 +74,26 @@ public class AuthServiceImpl implements AuthService {
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .locked(false)
-                .enabled(true)//TODO: change to false after allowing user to verify his email
+                .enabled(false)
                 .role(Role.User)
                 .build();
 
         userRepository.save(user);
+
+        String token = UUID.randomUUID().toString();
+        Confirmation confirmation = Confirmation.builder()
+                .token(token)
+                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .confirmed(false)
+                .user(user)
+                .build();
+
+        confirmationRepository.save(confirmation);
+
+        emailService.sendConfirmationMail(user.getEmail(), token);
     }
     @Override
     public boolean emailAlreadyUsed(String email) {
-        return userRepository.findByEmail(email).isPresent();
+        return userService.emailAlreadyUsed(email);
     }
-
-
 }
