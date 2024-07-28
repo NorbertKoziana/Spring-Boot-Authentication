@@ -11,10 +11,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
 
     private final ConfirmationRepository confirmationRepository;
 
-    @Override
-    @Transactional
-    public void confirmEmail(String token) {
-
+    public Confirmation checkToken(String token){
         Confirmation confirmation = confirmationRepository.findByToken(token)
                 .orElseThrow(() -> new IllegalStateException("Token not found."));
 
@@ -23,6 +20,14 @@ public class ConfirmationServiceImpl implements ConfirmationService {
 
         if(confirmation.getExpiresAt().isBefore(LocalDateTime.now()))
             throw new IllegalStateException("Token expired.");
+
+        return confirmation;
+    }
+
+    @Override
+    @Transactional
+    public void confirmEmail(String token) {
+        Confirmation confirmation = checkToken(token);
 
         confirmation.getUser().setEnabled(true);
         confirmation.setConfirmed(true);

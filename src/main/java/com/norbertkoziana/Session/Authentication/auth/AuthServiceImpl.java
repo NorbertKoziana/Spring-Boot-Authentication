@@ -1,9 +1,9 @@
 package com.norbertkoziana.Session.Authentication.auth;
 import com.norbertkoziana.Session.Authentication.confirmation.Confirmation;
 import com.norbertkoziana.Session.Authentication.confirmation.ConfirmationRepository;
-import com.norbertkoziana.Session.Authentication.dto.LoginRequest;
-import com.norbertkoziana.Session.Authentication.dto.RegisterRequest;
-import com.norbertkoziana.Session.Authentication.email.EmailService;
+import com.norbertkoziana.Session.Authentication.model.LoginRequest;
+import com.norbertkoziana.Session.Authentication.model.RegisterRequest;
+import com.norbertkoziana.Session.Authentication.email.ConfirmationEmailService;
 import com.norbertkoziana.Session.Authentication.user.UserRepository;
 import com.norbertkoziana.Session.Authentication.user.Role;
 import com.norbertkoziana.Session.Authentication.user.User;
@@ -34,16 +34,13 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    /*When I want to just save user to database then I use repository, when I use some logic associated with user
-     e.g. checking if user exists, then I use userService, that is why I inject both*/
+    private final UserService userService;
 
     private final UserRepository userRepository;
 
-    private final UserService userService;
-
     private final ConfirmationRepository confirmationRepository;
 
-    private final EmailService emailService;
+    private final ConfirmationEmailService confirmationEmailService;
 
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
@@ -90,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
 
         confirmationRepository.save(confirmation);
 
-        emailService.sendConfirmationMail(user.getEmail(), token);
+        confirmationEmailService.sendConfirmationMail(user.getEmail(), token);
     }
     @Override
     public boolean emailAlreadyUsed(String email) {

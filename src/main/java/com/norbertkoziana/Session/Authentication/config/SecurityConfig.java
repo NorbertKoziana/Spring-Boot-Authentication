@@ -1,8 +1,8 @@
 package com.norbertkoziana.Session.Authentication.config;
 
 import com.norbertkoziana.Session.Authentication.csrf.SpaCsrfTokenRequestHandler;
+import com.norbertkoziana.Session.Authentication.user.UserDetailsServiceImpl;
 import com.norbertkoziana.Session.Authentication.user.UserRepository;
-import com.norbertkoziana.Session.Authentication.user.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserServiceImpl(userRepository);
+        return new UserDetailsServiceImpl(userRepository);
     }
 
     @Bean
@@ -56,7 +56,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/login", "/auth/register", "auth/confirm/**").anonymous()
-                        .requestMatchers( "/", "/error").permitAll()
+                        .requestMatchers( "/", "/error", "user/password/reset", "/user/password/set").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout.logoutUrl("/auth/logout").logoutSuccessUrl("/"))

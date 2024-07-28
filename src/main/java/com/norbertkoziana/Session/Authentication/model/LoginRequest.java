@@ -1,4 +1,4 @@
-package com.norbertkoziana.Session.Authentication.dto;
+package com.norbertkoziana.Session.Authentication.model;
 import lombok.Data;
 @Data
 public class LoginRequest {

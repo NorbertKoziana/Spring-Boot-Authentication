@@ -1,6 +1,6 @@
 package com.norbertkoziana.Session.Authentication.auth;
-import com.norbertkoziana.Session.Authentication.dto.LoginRequest;
-import com.norbertkoziana.Session.Authentication.dto.RegisterRequest;
+import com.norbertkoziana.Session.Authentication.model.LoginRequest;
+import com.norbertkoziana.Session.Authentication.model.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
