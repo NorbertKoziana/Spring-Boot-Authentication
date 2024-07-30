@@ -1,6 +1,7 @@
 package com.norbertkoziana.Session.Authentication.config;
 
 import com.norbertkoziana.Session.Authentication.csrf.SpaCsrfTokenRequestHandler;
+import com.norbertkoziana.Session.Authentication.user.CustomOAuth2UserService;
 import com.norbertkoziana.Session.Authentication.user.UserDetailsServiceImpl;
 import com.norbertkoziana.Session.Authentication.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.*;
 
@@ -59,10 +63,22 @@ public class SecurityConfig {
                         .requestMatchers( "/", "/error", "user/password/reset", "/user/password/set").permitAll()
                         .anyRequest().authenticated()
                 )
-                .logout((logout) -> logout.logoutUrl("/auth/logout").logoutSuccessUrl("/"))
+                .logout((logout) -> logout
+                        .logoutUrl("/auth/logout").logoutSuccessUrl("/")
+                )
+                .oauth2Login((oauth2) -> oauth2
+                        .loginPage("/auth/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(this.oauth2UserService())
+                        )
+                )
         ;
 
         return http.build();
+    }
+
+    private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+        return new CustomOAuth2UserService();
     }
 
 }

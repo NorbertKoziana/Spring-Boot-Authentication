@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -17,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "User")
-public class User implements UserDetails {
+public class User implements UserDetails, OAuth2User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,5 +61,14 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return null;
+    }
+    @Override
+    public String getName() {
+        return email;
     }
 }
