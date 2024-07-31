@@ -1,13 +1,13 @@
 package com.norbertkoziana.Session.Authentication.auth;
 import com.norbertkoziana.Session.Authentication.confirmation.Confirmation;
 import com.norbertkoziana.Session.Authentication.confirmation.ConfirmationRepository;
+import com.norbertkoziana.Session.Authentication.confirmation.ConfirmationService;
 import com.norbertkoziana.Session.Authentication.model.LoginRequest;
 import com.norbertkoziana.Session.Authentication.model.RegisterRequest;
 import com.norbertkoziana.Session.Authentication.email.ConfirmationEmailService;
 import com.norbertkoziana.Session.Authentication.user.UserRepository;
 import com.norbertkoziana.Session.Authentication.user.Role;
 import com.norbertkoziana.Session.Authentication.user.User;
-import com.norbertkoziana.Session.Authentication.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -24,6 +24,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,9 +35,9 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserService userService;
-
     private final UserRepository userRepository;
+
+    private final ConfirmationService confirmationService;
 
     private final ConfirmationRepository confirmationRepository;
 
@@ -90,7 +91,33 @@ public class AuthServiceImpl implements AuthService {
         confirmationEmailService.sendConfirmationMail(user.getEmail(), token);
     }
     @Override
-    public boolean emailAlreadyUsed(String email) {
-        return userService.emailAlreadyUsed(email);
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public void resendConfirmationMail(User user) {
+
+        String token = confirmationRepository.findFirstByUserOrderByExpiresAtDesc(user)
+                .filter(confirmationService::checkIfConfirmationExpiryTimeIsAtLeast5Minutes)
+                .map(Confirmation::getToken)
+                .orElseGet( () -> {
+                        String newToken = UUID.randomUUID().toString();
+
+                        Confirmation newConfirmation = Confirmation.builder()
+                                .token(newToken)
+                                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                                .confirmed(false)
+                                .user(user)
+                                .build();
+
+                        confirmationRepository.save(newConfirmation);
+
+                        return newToken;
+                    }
+                );
+
+        confirmationEmailService.sendConfirmationMail(user.getEmail(), token);
     }
 }

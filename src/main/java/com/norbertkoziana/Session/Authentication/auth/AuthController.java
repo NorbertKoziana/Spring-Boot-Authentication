@@ -2,6 +2,7 @@ package com.norbertkoziana.Session.Authentication.auth;
 import com.norbertkoziana.Session.Authentication.model.LoginRequest;
 
 import com.norbertkoziana.Session.Authentication.model.RegisterRequest;
+import com.norbertkoziana.Session.Authentication.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -29,12 +32,19 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody RegisterRequest registerRequest){
-        if(authService.emailAlreadyUsed(registerRequest.getEmail()))
-            return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Object> register(@RequestBody RegisterRequest registerRequest){
+        Optional<User> userOptional = authService.findUserByEmail(registerRequest.getEmail());
 
-        authService.register(registerRequest);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        if(userOptional.isEmpty()){
+            authService.register(registerRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }
+
+        User user = userOptional.get();
+        if(!user.getEnabled())
+            authService.resendConfirmationMail(user);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

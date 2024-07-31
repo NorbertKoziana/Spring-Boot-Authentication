@@ -27,11 +27,6 @@ public class UserServiceImpl implements UserService{
     private final ChangePasswordEmailService changePasswordEmailService;
 
     @Override
-    public boolean emailAlreadyUsed(String email) {
-        return userRepository.findByEmail(email).isPresent();
-    }
-
-    @Override
     @Transactional
     public void initializePasswordReset(String email) {
         User user = userRepository.findByEmail(email)

@@ -32,4 +32,8 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         confirmation.getUser().setEnabled(true);
         confirmation.setConfirmed(true);
     }
+
+    public boolean checkIfConfirmationExpiryTimeIsAtLeast5Minutes(Confirmation confirmation){
+        return confirmation.getExpiresAt().isAfter(LocalDateTime.now().plusMinutes(5));
+    }
 }
