@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/login", "/auth/register", "auth/confirm/**").anonymous()
                         .requestMatchers( "/", "/error", "user/password/reset", "/user/password/set").permitAll()
+                        .requestMatchers( "/admin").hasAuthority("Admin")
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout

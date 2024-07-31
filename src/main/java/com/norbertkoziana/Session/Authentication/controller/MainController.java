@@ -10,8 +10,13 @@ public class MainController {
     }
 
     @GetMapping("/private")
-    public String test(){
+    public String privateMsg(){
         return "Hello logged in users!";
+    }
+
+    @GetMapping("/admin")
+    public String adminMsg(){
+        return "Hello logged in admins!";
     }
 
 }
