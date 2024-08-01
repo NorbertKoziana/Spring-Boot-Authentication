@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ConfirmationRepository extends JpaRepository<Confirmation, Integer> {
     Optional<Confirmation> findByToken(String token);
 
-    Optional<Confirmation> findFirstByUserOrderByExpiresAtDesc(User user);
+    Optional<Confirmation> findFirstByUserAndConfirmedFalseOrderByExpiresAtDesc(User user);
 }

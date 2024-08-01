@@ -99,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void resendConfirmationMail(User user) {
 
-        String token = confirmationRepository.findFirstByUserOrderByExpiresAtDesc(user)
+        String token = confirmationRepository.findFirstByUserAndConfirmedFalseOrderByExpiresAtDesc(user)
                 .filter(confirmationService::checkIfConfirmationExpiryTimeIsAtLeast5Minutes)
                 .map(Confirmation::getToken)
                 .orElseGet( () -> {
