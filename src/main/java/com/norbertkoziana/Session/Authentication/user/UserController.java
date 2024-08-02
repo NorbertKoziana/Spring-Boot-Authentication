@@ -1,5 +1,7 @@
 package com.norbertkoziana.Session.Authentication.user;
 
+import com.norbertkoziana.Session.Authentication.mapper.Mapper;
+import com.norbertkoziana.Session.Authentication.mapper.impl.UserMapper;
 import com.norbertkoziana.Session.Authentication.model.ResetPasswordRequest;
 import com.norbertkoziana.Session.Authentication.model.SetPasswordRequest;
 import com.norbertkoziana.Session.Authentication.model.UserDto;
@@ -7,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    private final Mapper<User, UserDto> userMapper;
 
     @PostMapping("/password/reset")
     ResponseEntity<Void> passwordReset(@RequestBody ResetPasswordRequest resetPasswordRequest){
@@ -39,15 +44,8 @@ public class UserController {
     }
 
     @GetMapping("/info")
-    UserDto getUserInfo(Authentication authentication){
-        User user = (User)authentication.getPrincipal();
-
-        return UserDto.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+    UserDto getUserInfo(@AuthenticationPrincipal User user){
+        return userMapper.mapTo(user);
     }
 
 }
