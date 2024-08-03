@@ -1,7 +1,7 @@
 package com.norbertkoziana.Session.Authentication.config;
 
 import com.norbertkoziana.Session.Authentication.csrf.SpaCsrfTokenRequestHandler;
-import com.norbertkoziana.Session.Authentication.user.CustomOAuth2UserService;
+import com.norbertkoziana.Session.Authentication.oauth2.CustomOAuth2UserService;
 import com.norbertkoziana.Session.Authentication.user.UserDetailsServiceImpl;
 import com.norbertkoziana.Session.Authentication.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.csrf.*;
 
 @Configuration
@@ -52,6 +53,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        SimpleUrlAuthenticationFailureHandler handler = new SimpleUrlAuthenticationFailureHandler("/oauth2/error");
 
         http
                 .csrf((csrf) -> csrf
@@ -60,7 +62,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/login", "/auth/register", "auth/confirm/**").anonymous()
-                        .requestMatchers( "/", "/error", "user/password/reset", "/user/password/set").permitAll()
+                        .requestMatchers( "/", "/error", "/oauth2/error", "user/password/reset", "/user/password/set").permitAll()
                         .requestMatchers( "/admin").hasAuthority("Admin")
                         .anyRequest().authenticated()
                 )
@@ -72,6 +74,10 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(this.oauth2UserService())
                         )
+                        .failureHandler((request, response, exception) -> {
+                            request.getSession().setAttribute("error.message", exception.getMessage());
+                            handler.onAuthenticationFailure(request, response, exception);
+                        })
                 )
         ;
 
