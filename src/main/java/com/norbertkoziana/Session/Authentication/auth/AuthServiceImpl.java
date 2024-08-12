@@ -78,6 +78,10 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
+        sendConfirmationMail(user);
+    }
+
+    public void sendConfirmationMail(User user){
         String token = UUID.randomUUID().toString();
         Confirmation confirmation = Confirmation.builder()
                 .token(token)
@@ -89,10 +93,6 @@ public class AuthServiceImpl implements AuthService {
         confirmationRepository.save(confirmation);
 
         confirmationEmailService.sendConfirmationMail(user.getEmail(), token);
-    }
-    @Override
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -119,5 +119,10 @@ public class AuthServiceImpl implements AuthService {
                 );
 
         confirmationEmailService.sendConfirmationMail(user.getEmail(), token);
+    }
+
+    @Override
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
