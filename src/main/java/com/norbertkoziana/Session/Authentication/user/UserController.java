@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -46,6 +48,17 @@ public class UserController {
     @GetMapping("/info")
     UserDto getUserInfo(@AuthenticationPrincipal User user){
         return userMapper.mapTo(user);
+    }
+
+    @PatchMapping("/{email}/block")
+    ResponseEntity<UserDto> blockUser(@PathVariable("email") String email){
+        Optional<User> user = userService.block(email);
+
+        return user.map(
+                (blockedUser) -> {
+                    return new ResponseEntity<>(userMapper.mapTo(blockedUser), HttpStatus.OK);
+                }
+        ).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 }

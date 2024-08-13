@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -56,4 +57,14 @@ public class UserServiceImpl implements UserService{
         confirmation.getUser().setPassword(passwordEncoder.encode(setPasswordRequest.getNewPassword()));
         confirmation.setConfirmed(true);
     }
+    @Override
+    @Transactional
+    public Optional<User> block(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        user.ifPresent((user1) -> user1.setLocked(true));
+
+        return user;
+    }
+
 }
