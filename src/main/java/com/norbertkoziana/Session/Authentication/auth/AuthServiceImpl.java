@@ -64,7 +64,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public User register(RegisterRequest registerRequest) {
-        //TODO: add validation
 
         User user = User.builder()
                 .firstName(registerRequest.getFirstName())

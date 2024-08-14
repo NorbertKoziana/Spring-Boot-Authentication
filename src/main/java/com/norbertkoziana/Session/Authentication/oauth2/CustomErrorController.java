@@ -5,7 +5,7 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 @RestController
-public class CustomErrorController implements ErrorController {//TODO switch to @ControllerAdvice, remove implements ErrorController
+public class CustomErrorController implements ErrorController {
 
     @GetMapping("/oauth2/error")
     public String handleError(HttpServletRequest request) {
