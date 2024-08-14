@@ -11,6 +11,6 @@ public interface AuthService {
 
     void login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response);
     void resendConfirmationMail(User user);
-    void register(RegisterRequest registerRequest);
+    User register(RegisterRequest registerRequest);
     Optional<User> findUserByEmail(String email);
 }

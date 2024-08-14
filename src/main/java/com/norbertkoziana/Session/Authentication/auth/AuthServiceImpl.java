@@ -63,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void register(RegisterRequest registerRequest) {
+    public User register(RegisterRequest registerRequest) {
         //TODO: add validation
 
         User user = User.builder()
@@ -78,21 +78,11 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        sendConfirmationMail(user);
-    }
-
-    public void sendConfirmationMail(User user){
-        String token = UUID.randomUUID().toString();
-        Confirmation confirmation = Confirmation.builder()
-                .token(token)
-                .expiresAt(LocalDateTime.now().plusMinutes(15))
-                .confirmed(false)
-                .user(user)
-                .build();
-
-        confirmationRepository.save(confirmation);
+        String token = createAndSaveConfirmation(user);
 
         confirmationEmailService.sendConfirmationMail(user.getEmail(), token);
+
+        return user;
     }
 
     @Override
@@ -103,18 +93,7 @@ public class AuthServiceImpl implements AuthService {
                 .filter(confirmationService::checkIfConfirmationExpiryTimeIsAtLeast5Minutes)
                 .map(Confirmation::getToken)
                 .orElseGet( () -> {
-                        String newToken = UUID.randomUUID().toString();
-
-                        Confirmation newConfirmation = Confirmation.builder()
-                                .token(newToken)
-                                .expiresAt(LocalDateTime.now().plusMinutes(15))
-                                .confirmed(false)
-                                .user(user)
-                                .build();
-
-                        confirmationRepository.save(newConfirmation);
-
-                        return newToken;
+                        return createAndSaveConfirmation(user);
                     }
                 );
 
@@ -124,5 +103,19 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    private String createAndSaveConfirmation(User user){
+        String token = UUID.randomUUID().toString();
+        Confirmation confirmation = Confirmation.builder()
+                .token(token)
+                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .confirmed(false)
+                .user(user)
+                .build();
+
+        confirmationRepository.save(confirmation);
+
+        return token;
     }
 }
