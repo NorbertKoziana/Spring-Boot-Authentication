@@ -1,6 +1,5 @@
 package com.norbertkoziana.Session.Authentication.confirmation;
 import com.norbertkoziana.Session.Authentication.data.TestDataUtil;
-import com.norbertkoziana.Session.Authentication.user.User;
 import com.norbertkoziana.Session.Authentication.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @DataJpaTest
-class ConfirmationRepositoryTest {
+class ConfirmationRepositoryIntegrationTest {
 
     private final ConfirmationRepository underTest;
 
     private final UserRepository userRepository;
 
     @Autowired
-    ConfirmationRepositoryTest(ConfirmationRepository underTest, UserRepository userRepository) {
+    ConfirmationRepositoryIntegrationTest(ConfirmationRepository underTest, UserRepository userRepository) {
         this.underTest = underTest;
         this.userRepository = userRepository;
     }

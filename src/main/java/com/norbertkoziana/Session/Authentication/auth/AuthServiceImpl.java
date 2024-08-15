@@ -5,6 +5,7 @@ import com.norbertkoziana.Session.Authentication.confirmation.ConfirmationServic
 import com.norbertkoziana.Session.Authentication.model.LoginRequest;
 import com.norbertkoziana.Session.Authentication.model.RegisterRequest;
 import com.norbertkoziana.Session.Authentication.email.ConfirmationEmailService;
+import com.norbertkoziana.Session.Authentication.token.ConfirmationTokenGenerator;
 import com.norbertkoziana.Session.Authentication.user.UserRepository;
 import com.norbertkoziana.Session.Authentication.user.Role;
 import com.norbertkoziana.Session.Authentication.user.User;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +42,8 @@ public class AuthServiceImpl implements AuthService {
     private final ConfirmationRepository confirmationRepository;
 
     private final ConfirmationEmailService confirmationEmailService;
+
+    private final ConfirmationTokenGenerator confirmationTokenGenerator;
 
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
@@ -104,8 +106,8 @@ public class AuthServiceImpl implements AuthService {
         return userRepository.findByEmail(email);
     }
 
-    private String createAndSaveConfirmation(User user){
-        String token = UUID.randomUUID().toString();
+    String createAndSaveConfirmation(User user){
+        String token = confirmationTokenGenerator.getConfirmationToken();
         Confirmation confirmation = Confirmation.builder()
                 .token(token)
                 .expiresAt(LocalDateTime.now().plusMinutes(15))

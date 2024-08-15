@@ -95,4 +95,8 @@ public final class TestDataUtil {
                 .build();
     }
 
+    public static String getTokenA() {
+        return "a82f333e-0335-4a8b-9239-31a68fe85cf9";
+    }
+
 }

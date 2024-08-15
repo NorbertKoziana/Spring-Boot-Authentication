@@ -4,6 +4,7 @@ import com.norbertkoziana.Session.Authentication.confirmation.ConfirmationReposi
 import com.norbertkoziana.Session.Authentication.confirmation.ConfirmationService;
 import com.norbertkoziana.Session.Authentication.email.ChangePasswordEmailService;
 import com.norbertkoziana.Session.Authentication.model.SetPasswordRequest;
+import com.norbertkoziana.Session.Authentication.token.ConfirmationTokenGenerator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +27,15 @@ public class UserServiceImpl implements UserService{
 
     private final ChangePasswordEmailService changePasswordEmailService;
 
+    private final ConfirmationTokenGenerator confirmationTokenGenerator;
+
     @Override
     @Transactional
     public void initializePasswordReset(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow( () -> new IllegalStateException("User not found"));
 
-        String token = UUID.randomUUID().toString();
+        String token = confirmationTokenGenerator.getConfirmationToken();
 
         Confirmation confirmation = Confirmation.builder()
                 .token(token)
