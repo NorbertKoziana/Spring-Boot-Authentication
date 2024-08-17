@@ -1,5 +1,7 @@
 package com.norbertkoziana.Session.Authentication.data;
 import com.norbertkoziana.Session.Authentication.confirmation.Confirmation;
+import com.norbertkoziana.Session.Authentication.model.LoginRequest;
+import com.norbertkoziana.Session.Authentication.model.RegisterRequest;
 import com.norbertkoziana.Session.Authentication.user.Role;
 import com.norbertkoziana.Session.Authentication.user.User;
 
@@ -99,4 +101,19 @@ public final class TestDataUtil {
         return "a82f333e-0335-4a8b-9239-31a68fe85cf9";
     }
 
+    public static LoginRequest getLoginRequestA(){
+        return LoginRequest.builder()
+                .email("johhny@gmail.com")
+                .password("123456")
+                .build();
+    }
+
+    public static RegisterRequest getRegisterRequestA(){
+        return RegisterRequest.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("johhny@gmail.com")
+                .password("123456")
+                .build();
+    }
 }
