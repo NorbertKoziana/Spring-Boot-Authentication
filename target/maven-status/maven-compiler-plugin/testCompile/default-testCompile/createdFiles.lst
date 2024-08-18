@@ -1,0 +1,8 @@
+com\norbertkoziana\Session\Authentication\confirmation\ConfirmationServiceImplUnitTest.class
+com\norbertkoziana\Session\Authentication\auth\CompleteLocalAuthenticationTest.class
+com\norbertkoziana\Session\Authentication\SessionAuthenticationApplicationTests.class
+com\norbertkoziana\Session\Authentication\confirmation\ConfirmationRepositoryIntegrationTest.class
+com\norbertkoziana\Session\Authentication\auth\AuthServiceUnitTest.class
+com\norbertkoziana\Session\Authentication\auth\AuthControllerIntegrationTest.class
+com\norbertkoziana\Session\Authentication\data\TestDataUtil.class
+com\norbertkoziana\Session\Authentication\controller\MainControllerTest.class
