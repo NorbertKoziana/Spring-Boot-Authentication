@@ -13,6 +13,9 @@ public class SessionConfig {
     @Value("${spring.data.redis.host}")
     private String host;
 
+    @Value("${spring.data.redis.username}")
+    private String username;
+
     @Value("${spring.data.redis.password}")
     private String password;
 
@@ -23,6 +26,7 @@ public class SessionConfig {
     public LettuceConnectionFactory connectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(host);
+        redisStandaloneConfiguration.setUsername(username);
         redisStandaloneConfiguration.setPassword(RedisPassword.of(password));
         redisStandaloneConfiguration.setPort(port);
 
