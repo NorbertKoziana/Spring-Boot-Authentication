@@ -11,7 +11,7 @@ This is a Spring Boot backend project focused on providing authentication and au
 - **Session Management**: Sessions are stored in Redis for scalability.
 - **CSRF Protection**: Secures the application against Cross-Site Request Forgery attacks.
 - **User Information Endpoint**: Provides details about the currently logged-in user.
-- **Role-Based Access Control**: Endpoints are restricted based on user roles (e.g., admin, logged-in users).
+- **Role-Based Access Control**: Endpoints are restricted based on user roles (Admin, User).
 - **Unit & Integration Tests** Application is partly tested using JUnit 5, Mockito, MockMvc.
 
 ## Endpoints Overview
@@ -38,7 +38,7 @@ This is a Spring Boot backend project focused on providing authentication and au
 
 ## Running the Application
 
-You can test the application on [Render.com](https://render.com) or run it locally. Note that running it locally requires additional configuration due to the use of OAuth2 and Google SMTP for sending emails.
+Running application locally requires additional configuration due to the use of OAuth2 and Google SMTP for sending emails.
 
 ### Prerequisites
 
@@ -67,13 +67,13 @@ If you choose to run the application locally make sure to replace following prop
 #### a) Register a New Account
 - `POST /auth/register` - Create a local account. An email will be sent to confirm the provided email address.
 
-Use the following JSON body in Postman to register a new account. It's recommended to use a real email address because you will need to confirm access to this email to log in. If you prefer not to use your real data, you might want to use a temporary email service (e.g., 10 Minute Mail):
+Use the following JSON body in Postman to register a new account. It's recommended to use a real email address because you will need to confirm access to this email to log in. If you prefer not to use your real data, you might want to use a temporary email service (e.g. 10 Minute Mail):
 
 ```json
 {
     "firstName": "Your Firstname",
     "lastName": "Your Lastname",
-    "email": "Your EmailAddress",
+    "email": "Your Email Address",
     "password": "Your Password"
 }
 ```
@@ -82,7 +82,6 @@ Use the following JSON body in Postman to register a new account. It's recommend
 - `POST /auth/login` - Log in using a local account (email and password).
 - `GET /oauth2/authorization/google` - Log in using a Google account.
 - `GET /oauth2/authorization/facebook` - Log in using a Facebook account.
-To use oauth2 I recomend using your browser.
 To log in using a local account, send a Postman request with the following JSON body:
 ```json
 {
@@ -92,24 +91,29 @@ To log in using a local account, send a Postman request with the following JSON 
 ```
 For OAuth2 logins (Google or Facebook) I recommend to use your browser instead of Postman.
 
-When logging in with an external account for the first time, a local account will be created without a password. You can later log in using the same or another external account associated with the same email address, or you can set a password (see section e) Reset or Change Password) to enable local login.
+When logging in with an external account (using OAuth2) for the first time, a local account will be created without a password. You can later log in using the same or another external account associated with the same email address, or you can set a password (see section e) Reset or Change Password) to enable local login.
 
 #### c) Log Out
 - `POST /auth/logout` - Log out from your account.
 
 #### d) Confirm Your Email Address
-- `GET /auth/confirm` - Confirms that the email address provided during registration belongs to you. This is typically done by clicking the link sent to you in the verification email.
+- `GET /auth/confirm` - Confirms that the email address provided during registration belongs to you. This is typically done by clicking the link sent to you in the verification email after registration.
+![image](https://github.com/user-attachments/assets/da5982e7-3464-4b1c-a1a1-0ecd41b8acc2)
+
 
 You will have 15 minutes to confirm your email. If you need the system to resend the confirmation email (e.g., if you accidentally deleted it), you can send a POST request to /auth/register with the same email as before, and a new confirmation email will be sent.
 
 #### e) Reset or Change Password
-- `POST /user/password/reset` - Initiate a password reset (sends a token to your email).
+- `POST /user/password/reset` - Initiate a password reset.
 Send request  with the following JSON like this:
 ```json
 {
     "email": "Your Email"
 }
 ```
+After that you should receive email with token that will let you set new password:
+![image](https://github.com/user-attachments/assets/9b792478-cde0-474d-99db-eeecb0447948)
+
 - `PATCH /user/password/set` - Set a new password using the token.
 Send request  with the following JSON like this:
 ```json
@@ -130,4 +134,4 @@ Send request  with the following JSON like this:
 
 ## Tests
 
-Note that integration tests require Google SMTP and OAuth2 credentials, so they might fail if these are not specified in `application.properties`.
+Note that integration tests require Google SMTP and OAuth2 secrets, so they might fail if these are not specified in `application.properties`.
