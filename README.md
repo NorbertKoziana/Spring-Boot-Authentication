@@ -16,6 +16,8 @@ This is a Spring Boot backend project focused on providing authentication and au
 
 ## Endpoints Overview
 
+Before querying these endpoints with Postman, ensure that you include the `X-XSRF-TOKEN` in the headers, which will be provided to you in a cookie.
+
 - **Authentication:**
   - `POST /auth/register` - Register a new user.
   - `POST /auth/login` - Log in with an existing account (email and password).
@@ -30,6 +32,9 @@ This is a Spring Boot backend project focused on providing authentication and au
 
 - **User Information:**
   - `GET /user/info` - Get information about the currently logged-in user.
+ 
+- **User Blocking:**
+  - `PATCH /users/{email}/block` - Block a user by their email address. This operation is restricted to admin users only.
   
 - **Access Control:**
   - `GET /` - Public endpoint available to all users.
@@ -127,7 +132,10 @@ Send request  with the following JSON like this:
 #### f) View User Information
 - `GET /user/info` - Get information about the currently logged-in user.
 
-#### g) Test Role-Based Access Control
+#### g) Block user
+- `PATCH /users/{email}/block` - Block a user by their email address. This operation is restricted to admin users only. Make sure to replace {email} with email address of a user you want to block.
+
+#### h) Test Role-Based Access Control
 - `GET /` - Public endpoint available to everyone.
 - `GET /private` - Accessible only to logged-in users.
 - `GET /admin` - Accessible only to users with admin authority.
