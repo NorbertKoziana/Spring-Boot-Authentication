@@ -51,16 +51,16 @@ Running application locally requires additional configuration due to the use of 
 If you choose to run the application locally make sure to replace following properties in `application.properties` file:
 
 - **Google SMTP Configuration:**
-  - in `spring.mail.username` replace *${SPRING_MAIL_USERNAME}* with your email username
-  - in `spring.mail.password` replace *${SPRING_MAIL_PASSWORD}* with your email password
+  - in `spring.mail.username` replace *${SPRING_MAIL_USERNAME}* with your credentials
+  - in `spring.mail.password` replace *${SPRING_MAIL_PASSWORD}* with your credentials
 
 - **Google OAuth2 Configuration:**
-  - `spring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID}`
-  - `spring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET}`
+  - in `spring.security.oauth2.client.registration.google.client-id` replace ${GOOGLE_CLIENT_ID} with your credentials
+  - in `spring.security.oauth2.client.registration.google.client-secret` replace ${GOOGLE_CLIENT_SECRET} with your credentials
 
 - **Facebook OAuth2 Configuration:**
-  - `spring.security.oauth2.client.registration.facebook.client-id=${FACEBOOK_CLIENT_ID}`
-  - `spring.security.oauth2.client.registration.facebook.client-secret=${FACEBOOK_CLIENT_SECRET}`
+  - in `spring.security.oauth2.client.registration.facebook.client-id` replace ${FACEBOOK_CLIENT_ID} with your credentials
+  - in `spring.security.oauth2.client.registration.facebook.client-secret` replace ${FACEBOOK_CLIENT_SECRET} with your credentials
 
 ### Using the Application (Walkthrough)
 
@@ -85,13 +85,13 @@ Use the following JSON body in Postman to register a new account. It's recommend
 To log in using a local account, send a Postman request with the following JSON body:
 ```json
 {
-    "email":"YourEmailAddress",
-    "password": "YourPassword"
+    "email":"Your Email Address",
+    "password": "Your Password"
 }
 ```
 For OAuth2 logins (Google or Facebook) I recommend to use your browser instead of Postman.
 
-When logging in with an external account (using OAuth2) for the first time, a local account will be created without a password. You can later log in using the same or another external account associated with the same email address, or you can set a password (see section e) Reset or Change Password) to enable local login.
+When logging in with an external account (using OAuth2) for the first time, a local account will be created without a password. You can later log in using the same or another external account associated with the same email address, or you can set a password [see section e) Reset or Change Password] to enable local login.
 
 #### c) Log Out
 - `POST /auth/logout` - Log out from your account.
