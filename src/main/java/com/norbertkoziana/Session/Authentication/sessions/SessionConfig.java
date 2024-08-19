@@ -4,8 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
 @Configuration(proxyBeanMethods = false)
 @EnableRedisHttpSession
 public class SessionConfig {
@@ -22,6 +24,9 @@ public class SessionConfig {
     @Value("${spring.data.redis.port}")
     private Integer port;
 
+    @Value("${spring.redis.ssl:false}")
+    private Boolean useSSL;
+
     @Bean
     public LettuceConnectionFactory connectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
@@ -29,6 +34,17 @@ public class SessionConfig {
         redisStandaloneConfiguration.setUsername(username);
         redisStandaloneConfiguration.setPassword(RedisPassword.of(password));
         redisStandaloneConfiguration.setPort(port);
+
+        if(useSSL){
+            LettuceClientConfiguration.LettuceClientConfigurationBuilder lettuceClientConfigurationBuilder =
+                    LettuceClientConfiguration.builder();
+
+            lettuceClientConfigurationBuilder.useSsl();
+
+            LettuceClientConfiguration lettuceClientConfiguration = lettuceClientConfigurationBuilder.build();
+
+            return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration);
+        }
 
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
