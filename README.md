@@ -43,15 +43,17 @@ Before querying these endpoints with Postman, ensure that you include the `X-XSR
 
 ## Running the Application
 
-Running application locally requires additional configuration due to the use of OAuth2 and Google SMTP for sending emails.
+You can test the application by visiting [render.com](https://norbert-koziana-01.onrender.com) (first request might take few minutes to load) Alternatively, you can run it locally, though this requires extra configuration due to the use of OAuth2 and Google SMTP for email functionality. If your goal is simply to test the API endpoints with Postman, it's recommended to use the provided link above for convenience.
 
-### Prerequisites
+### Running on Your Machine
+
+#### Prerequisites
 
 - Java 17+
 - Postman (for testing the endpoints)
 - Docker (for running Redis and MySQL)
 
-### Initial Configuration
+#### Initial Configuration
 
 If you choose to run the application locally make sure to replace following properties in `application.properties` file:
 
@@ -67,7 +69,7 @@ If you choose to run the application locally make sure to replace following prop
   - in `spring.security.oauth2.client.registration.facebook.client-id` replace ${FACEBOOK_CLIENT_ID} with your credentials
   - in `spring.security.oauth2.client.registration.facebook.client-secret` replace ${FACEBOOK_CLIENT_SECRET} with your credentials
 
-### Using the Application (Walkthrough)
+## Using the Application (Walkthrough)
 
 #### a) Register a New Account
 - `POST /auth/register` - Create a local account. An email will be sent to confirm the provided email address.
