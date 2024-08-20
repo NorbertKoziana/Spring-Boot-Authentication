@@ -43,7 +43,7 @@ Before querying these endpoints with Postman, ensure that you include the `X-XSR
 
 ## Running the Application
 
-You can test the application by visiting [render.com](https://norbert-koziana-01.onrender.com) (first request might take few minutes to load) Alternatively, you can run it locally, though this requires extra configuration due to the use of OAuth2 and Google SMTP for email functionality. If your goal is simply to test the API endpoints with Postman, it's recommended to use the provided link above for convenience.
+You can test the application by visiting [render.com](https://norbert-koziana.onrender.com) (first request might take few minutes to load) Alternatively, you can run it locally, though this requires extra configuration due to the use of OAuth2 and Google SMTP for email functionality. If your goal is simply to test the API endpoints with Postman, it's recommended to use the provided link above for convenience.
 
 ### Running on Your Machine
 
