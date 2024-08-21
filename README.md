@@ -16,6 +16,8 @@ This is a Spring Boot backend project focused on providing authentication and au
 
 ## Endpoints Overview
 
+Before querying these endpoints with Postman, ensure that you include the `X-XSRF-TOKEN` in the headers, which will be provided to you in a cookie.
+
 - **Authentication:**
   - `POST /auth/register` - Register a new user.
   - `POST /auth/login` - Log in with an existing account (email and password).
@@ -30,6 +32,9 @@ This is a Spring Boot backend project focused on providing authentication and au
 
 - **User Information:**
   - `GET /user/info` - Get information about the currently logged-in user.
+ 
+- **User Blocking:**
+  - `PATCH /users/{email}/block` - Block a user by their email address. This operation is restricted to admin users only.
   
 - **Access Control:**
   - `GET /` - Public endpoint available to all users.
@@ -38,31 +43,33 @@ This is a Spring Boot backend project focused on providing authentication and au
 
 ## Running the Application
 
-Running application locally requires additional configuration due to the use of OAuth2 and Google SMTP for sending emails.
+You can test the application by visiting [render.com](https://norbert-koziana.onrender.com) (first request might take few minutes to load) Alternatively, you can run it locally, though this requires extra configuration due to the use of OAuth2 and Google SMTP for email functionality. If your goal is simply to test the API endpoints with Postman, it's recommended to use the provided link above for convenience.
 
-### Prerequisites
+### Running on Your Machine
+
+#### Prerequisites
 
 - Java 17+
 - Postman (for testing the endpoints)
 - Docker (for running Redis and MySQL)
 
-### Initial Configuration
+#### Initial Configuration
 
 If you choose to run the application locally make sure to replace following properties in `application.properties` file:
 
 - **Google SMTP Configuration:**
-  - in `spring.mail.username` replace *${SPRING_MAIL_USERNAME}* with your email username
-  - in `spring.mail.password` replace *${SPRING_MAIL_PASSWORD}* with your email password
+  - in `spring.mail.username` replace *${SPRING_MAIL_USERNAME}* with your credentials
+  - in `spring.mail.password` replace *${SPRING_MAIL_PASSWORD}* with your credentials
 
 - **Google OAuth2 Configuration:**
-  - `spring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID}`
-  - `spring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET}`
+  - in `spring.security.oauth2.client.registration.google.client-id` replace ${GOOGLE_CLIENT_ID} with your credentials
+  - in `spring.security.oauth2.client.registration.google.client-secret` replace ${GOOGLE_CLIENT_SECRET} with your credentials
 
 - **Facebook OAuth2 Configuration:**
-  - `spring.security.oauth2.client.registration.facebook.client-id=${FACEBOOK_CLIENT_ID}`
-  - `spring.security.oauth2.client.registration.facebook.client-secret=${FACEBOOK_CLIENT_SECRET}`
+  - in `spring.security.oauth2.client.registration.facebook.client-id` replace ${FACEBOOK_CLIENT_ID} with your credentials
+  - in `spring.security.oauth2.client.registration.facebook.client-secret` replace ${FACEBOOK_CLIENT_SECRET} with your credentials
 
-### Using the Application (Walkthrough)
+## Using the Application (Walkthrough)
 
 #### a) Register a New Account
 - `POST /auth/register` - Create a local account. An email will be sent to confirm the provided email address.
@@ -85,13 +92,13 @@ Use the following JSON body in Postman to register a new account. It's recommend
 To log in using a local account, send a Postman request with the following JSON body:
 ```json
 {
-    "email":"YourEmailAddress",
-    "password": "YourPassword"
+    "email":"Your Email Address",
+    "password": "Your Password"
 }
 ```
 For OAuth2 logins (Google or Facebook) I recommend to use your browser instead of Postman.
 
-When logging in with an external account (using OAuth2) for the first time, a local account will be created without a password. You can later log in using the same or another external account associated with the same email address, or you can set a password (see section e) Reset or Change Password) to enable local login.
+When logging in with an external account (using OAuth2) for the first time, a local account will be created without a password. You can later log in using the same or another external account associated with the same email address, or you can set a password [see section e) Reset or Change Password] to enable local login.
 
 #### c) Log Out
 - `POST /auth/logout` - Log out from your account.
@@ -127,7 +134,10 @@ Send request  with the following JSON like this:
 #### f) View User Information
 - `GET /user/info` - Get information about the currently logged-in user.
 
-#### g) Test Role-Based Access Control
+#### g) Block user
+- `PATCH /users/{email}/block` - Block a user by their email address. This operation is restricted to admin users only. Make sure to replace {email} with email address of a user you want to block.
+
+#### h) Test Role-Based Access Control
 - `GET /` - Public endpoint available to everyone.
 - `GET /private` - Accessible only to logged-in users.
 - `GET /admin` - Accessible only to users with admin authority.
