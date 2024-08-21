@@ -8,10 +8,13 @@ import com.norbertkoziana.Session.Authentication.token.ConfirmationTokenGenerato
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,8 @@ public class UserServiceImpl implements UserService{
     private final ChangePasswordEmailService changePasswordEmailService;
 
     private final ConfirmationTokenGenerator confirmationTokenGenerator;
+
+    private final FindByIndexNameSessionRepository<? extends Session> sessions;
 
     @Override
     @Transactional
@@ -62,11 +67,21 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public Optional<User> block(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        user.ifPresent((user1) -> user1.setLocked(true));
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
 
-        return user;
+            user.setLocked(true);
+
+            Set<String> usersSessionIds = sessions.findByPrincipalName(user.getEmail()).keySet();
+
+            for (String id: usersSessionIds) {
+                sessions.deleteById(id);
+            }
+        }
+
+        return optionalUser;
     }
 
 }
